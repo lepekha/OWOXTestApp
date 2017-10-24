@@ -34,5 +34,6 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'
 }

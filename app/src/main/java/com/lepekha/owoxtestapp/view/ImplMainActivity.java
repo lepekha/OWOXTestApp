@@ -1,4 +1,4 @@
-package com.lepekha.owoxtestapp;
+package com.lepekha.owoxtestapp.view;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,7 +9,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+import com.lepekha.owoxtestapp.R;
+
+public class ImplMainActivity extends AppCompatActivity implements MainActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
