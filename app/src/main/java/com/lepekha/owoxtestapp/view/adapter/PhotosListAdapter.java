@@ -6,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lepekha.owoxtestapp.R;
+import com.lepekha.owoxtestapp.model.pojo.Photo;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,6 +19,8 @@ import butterknife.ButterKnife;
 
 public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.ViewHolder> {
 
+    List<Photo> photos;
+
     public class ViewHolder extends RecyclerView.ViewHolder{
 
 
@@ -23,6 +28,10 @@ public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.Vi
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public PhotosListAdapter(List<Photo> photos) {
+        this.photos = photos;
     }
 
     @Override
@@ -39,6 +48,6 @@ public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return 0;
+        return photos.size();
     }
 }

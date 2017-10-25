@@ -1,5 +1,6 @@
 package com.lepekha.owoxtestapp.model.rest;
 
+import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.model.api.APIhelper;
 import com.lepekha.owoxtestapp.model.api.RxUtil;
 import com.lepekha.owoxtestapp.model.api.UnsplashApi;
@@ -22,6 +23,7 @@ public class RequestImpl implements Request {
     private UnsplashApi unsplashApi;
 
     public RequestImpl() {
+        App.getComponent().inject(this);
         unsplashApi = apiHelper.getService();
     }
 

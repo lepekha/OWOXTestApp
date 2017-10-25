@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.lepekha.owoxtestapp.model.api.APIhelper;
 import com.lepekha.owoxtestapp.model.api.UnsplashApi;
+import com.lepekha.owoxtestapp.model.rest.RequestImpl;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import javax.inject.Singleton;
@@ -22,5 +23,12 @@ public class ModelModule {
     @NonNull
     public APIhelper provideAPIhelper(){
         return new APIhelper();
+    }
+
+    @Provides
+    @Singleton
+    @NonNull
+    public RequestImpl provideRequestImpl(){
+        return new RequestImpl();
     }
 }

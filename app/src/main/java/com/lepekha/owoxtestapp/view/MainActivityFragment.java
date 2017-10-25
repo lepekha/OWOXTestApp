@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.R;
 
 import butterknife.BindInt;
@@ -19,17 +20,17 @@ import butterknife.ButterKnife;
  */
 public class MainActivityFragment extends Fragment {
 
+
+
     @BindView(R.id.photos_list)
     RecyclerView photosList;
-
-    @BindInt(R.integer.gridCount) int gridCount;
-
     private RecyclerView.Adapter photosListAdapter;
     private RecyclerView.LayoutManager photoListManager;
 
-
+    @BindInt(R.integer.gridCount) int gridCount;
 
     public MainActivityFragment() {
+
     }
 
     public static MainActivityFragment newInstance(){
@@ -44,6 +45,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, view);
+
         photoListManager = new GridLayoutManager(getContext(),gridCount);
         photosList.setLayoutManager(photoListManager);
         return view;

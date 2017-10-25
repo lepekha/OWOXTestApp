@@ -11,11 +11,18 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.R;
+import com.lepekha.owoxtestapp.presenter.DownloadPhotosImpl;
+
+import javax.inject.Inject;
 
 public class MainActivityImpl extends AppCompatActivity implements MainActivity{
 
     FragmentManager fragmentManager = getSupportFragmentManager();
+
+    @Inject
+    DownloadPhotosImpl downloadPhotos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +30,8 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        App.getComponent().inject(this);
+        downloadPhotos.getPhotosFromAPI("1","10");
         fragmentManager.beginTransaction()
                 .add(R.id.fragmentConteiner, MainActivityFragment.newInstance())
                 .commit();
