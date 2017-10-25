@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.lepekha.owoxtestapp.di.AppComponent;
 import com.lepekha.owoxtestapp.di.DaggerAppComponent;
+import com.lepekha.owoxtestapp.di.ModelModule;
 import com.lepekha.owoxtestapp.di.ViewModule;
 
 /**
@@ -24,6 +25,7 @@ public class App extends Application {
 
     protected void buildComponent(){
         component = DaggerAppComponent.builder()
+                .modelModule(new ModelModule())
                 .viewModule(new ViewModule())
                 .build();
     }

@@ -2,6 +2,8 @@ package com.lepekha.owoxtestapp.di;
 
 import android.support.annotation.NonNull;
 
+import com.lepekha.owoxtestapp.model.api.APIhelper;
+import com.lepekha.owoxtestapp.model.api.UnsplashApi;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import javax.inject.Singleton;
@@ -13,12 +15,12 @@ import dagger.Provides;
  * Created by Ruslan on 12.09.2017.
  */
 @Module
-public class ViewModule {
+public class ModelModule {
 
     @Provides
     @Singleton
     @NonNull
-    public MainActivityImpl provideMainActivityImpl(){
-        return new MainActivityImpl();
+    public APIhelper provideAPIhelper(){
+        return new APIhelper();
     }
 }
