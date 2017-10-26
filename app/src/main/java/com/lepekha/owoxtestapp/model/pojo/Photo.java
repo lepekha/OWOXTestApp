@@ -3,7 +3,7 @@ package com.lepekha.owoxtestapp.model.pojo;
 /**
  * Created by Ruslan on 24.10.2017.
  */
-
+/**Обьект для хранения json пришедшего от GET /photos*/
 public class Photo {
     private String id;
     private String createdAt;
@@ -15,19 +15,8 @@ public class Photo {
     private boolean likedByUser;
     private String description;
     private Urls urls;
-    /**
-     *
-     * @param updatedAt
-     * @param id
-     * @param height
-     * @param color
-     * @param urls
-     * @param description
-     * @param createdAt
-     * @param likes
-     * @param width
-     * @param likedByUser
-     */
+
+
     public Photo(String id, String createdAt, String updatedAt, int width, int height, String color, int likes, boolean likedByUser, String description, Urls urls) {
         this.id = id;
         this.createdAt = createdAt;

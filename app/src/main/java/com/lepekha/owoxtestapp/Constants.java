@@ -6,4 +6,5 @@ package com.lepekha.owoxtestapp;
 
 public interface Constants {
     String BASE_URL = "https://api.unsplash.com/";
+    int PER_PAGE = 30;
 }

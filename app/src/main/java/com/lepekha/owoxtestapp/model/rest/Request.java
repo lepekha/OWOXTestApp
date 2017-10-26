@@ -1,6 +1,7 @@
 package com.lepekha.owoxtestapp.model.rest;
 
 import com.lepekha.owoxtestapp.model.pojo.Photo;
+import com.lepekha.owoxtestapp.model.pojo.SearchPhoto;
 
 import java.util.List;
 
@@ -12,4 +13,5 @@ import rx.Observable;
 
 public interface Request {
     Observable<List<Photo>> getPhotos(String page, String per_page);
+    Observable<List<SearchPhoto>> searchPhotos(String query, String page, String per_page);
 }

@@ -1,6 +1,8 @@
 package com.lepekha.owoxtestapp.view.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.ImageView;
 
 import com.lepekha.owoxtestapp.R;
 import com.lepekha.owoxtestapp.model.pojo.Photo;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -20,7 +23,8 @@ import butterknife.ButterKnife;
 
 public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.ViewHolder> {
 
-    List<Photo> photos;
+    private List<Photo> photos;
+    private Context context;
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -34,8 +38,9 @@ public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.Vi
         }
     }
 
-    public PhotosListAdapter(List<Photo> photos) {
+    public PhotosListAdapter(List<Photo> photos, Context context) {
         this.photos = photos;
+        this.context = context;
     }
 
     @Override
@@ -47,11 +52,12 @@ public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
+        Picasso.with(context).load(photos.get(position).getUrls().getThumb()).into(holder.imgThumbneilPhoto);
     }
 
     @Override
     public int getItemCount() {
         return photos.size();
     }
+
 }

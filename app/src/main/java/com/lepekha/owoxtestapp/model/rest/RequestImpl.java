@@ -5,6 +5,7 @@ import com.lepekha.owoxtestapp.model.api.APIhelper;
 import com.lepekha.owoxtestapp.model.api.RxUtil;
 import com.lepekha.owoxtestapp.model.api.UnsplashApi;
 import com.lepekha.owoxtestapp.model.pojo.Photo;
+import com.lepekha.owoxtestapp.model.pojo.SearchPhoto;
 
 import java.util.List;
 
@@ -31,6 +32,13 @@ public class RequestImpl implements Request {
     public Observable<List<Photo>> getPhotos(String page, String per_page) {
         return unsplashApi
                 .getPhotos(page, per_page)
+                .compose(RxUtil.applyIOToMainThreadSchedulers());
+    }
+
+    @Override
+    public Observable<List<SearchPhoto>> searchPhotos(String query, String page, String per_page) {
+        return unsplashApi
+                .searchPhotos(query, page, per_page)
                 .compose(RxUtil.applyIOToMainThreadSchedulers());
     }
 }

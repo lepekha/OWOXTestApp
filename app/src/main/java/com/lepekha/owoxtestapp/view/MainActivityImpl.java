@@ -31,7 +31,6 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         App.getComponent().inject(this);
-        downloadPhotos.getPhotosFromAPI("1","10");
         fragmentManager.beginTransaction()
                 .add(R.id.fragmentConteiner, MainActivityFragment.newInstance())
                 .commit();

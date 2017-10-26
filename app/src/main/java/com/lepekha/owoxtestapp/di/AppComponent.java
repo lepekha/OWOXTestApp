@@ -3,6 +3,7 @@ package com.lepekha.owoxtestapp.di;
 import com.lepekha.owoxtestapp.model.api.APIhelper;
 import com.lepekha.owoxtestapp.model.rest.RequestImpl;
 import com.lepekha.owoxtestapp.presenter.DownloadPhotosImpl;
+import com.lepekha.owoxtestapp.view.MainActivityFragment;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import javax.inject.Singleton;
@@ -19,4 +20,5 @@ public interface AppComponent {
         void inject(RequestImpl requestImpl);
         void inject(DownloadPhotosImpl downloadPhotosImpl);
         void inject(MainActivityImpl mainActivityImpl);
+        void inject(MainActivityFragment mainActivityFragment);
 }

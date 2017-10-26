@@ -2,6 +2,7 @@ package com.lepekha.owoxtestapp.di;
 
 import android.support.annotation.NonNull;
 
+import com.lepekha.owoxtestapp.view.MainActivityFragment;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import javax.inject.Singleton;
@@ -20,5 +21,12 @@ public class ViewModule {
     @NonNull
     public MainActivityImpl provideMainActivityImpl(){
         return new MainActivityImpl();
+    }
+
+    @Provides
+    @Singleton
+    @NonNull
+    public MainActivityFragment provideMainActivityFragment(){
+        return new MainActivityFragment();
     }
 }

@@ -3,7 +3,7 @@ package com.lepekha.owoxtestapp.model.pojo;
 /**
  * Created by Ruslan on 24.10.2017.
  */
-
+/**Обьект для хранения ссылок на фото которые входят в json пришедший от GET /photos*/
 public class Urls {
 
     private String raw;
@@ -11,14 +11,7 @@ public class Urls {
     private String regular;
     private String small;
     private String thumb;
-    /**
-     *
-     * @param raw
-     * @param regular
-     * @param full
-     * @param thumb
-     * @param small
-     */
+
     public Urls(String raw, String full, String regular, String small, String thumb) {
         this.raw = raw;
         this.full = full;
