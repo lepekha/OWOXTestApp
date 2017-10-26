@@ -43,7 +43,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
 
                     @Override
                     public void onNext(List<Photo> photos) {
-                        Log.i("QWE", photos.size()+"");
+                        Log.i("QWE", photos.get(1).getUrls().getRegular()+"");
                     }
                 });
 
