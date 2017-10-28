@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,11 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.lepekha.owoxtestapp.App;
-import com.lepekha.owoxtestapp.Constants;
 import com.lepekha.owoxtestapp.R;
 import com.lepekha.owoxtestapp.event.FinishLoadPhoto;
+import com.lepekha.owoxtestapp.model.cache.ImplPreference;
 import com.lepekha.owoxtestapp.model.pojo.Photo;
 import com.lepekha.owoxtestapp.presenter.DownloadPhotosImpl;
 import com.lepekha.owoxtestapp.view.adapter.PhotosListAdapter;
@@ -33,6 +33,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.BindInt;
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -40,9 +41,11 @@ import butterknife.OnClick;
 /**
  * Фрагмент для отображения списка фотографий загруженных с АПИ
  */
-public class MainActivityFragment extends Fragment implements PhotosListAdapter.OnItemClickListener  {
+public class ListPhotosFragment extends Fragment implements PhotosListAdapter.OnItemClickListener  {
 
     private int PAGE = 1;
+    private int STATE = 0;
+    String query;
 
     @Inject
     DownloadPhotosImpl downloadPhotos;
@@ -52,6 +55,18 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
 
     @BindView(R.id.btnLoadMore)
     Button btnLoadMore;
+
+    @BindView(R.id.txtNoResults)
+    TextView txtNoResults;
+
+    @BindString(R.string.menu_new_photos)
+    String TITLE_NEW_PHOTOS;
+
+    @BindString(R.string.menu_search)
+    String TITLE_SEARCH;
+
+    @Inject
+    ImplPreference cache;
 
     private boolean flagFirstStartDevice = false;
 
@@ -68,19 +83,17 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
 
     @BindInt(R.integer.gridCount) int gridCount;
 
-    public static MainActivityFragment newInstance() {
-        MainActivityFragment mainActivityFragment = new MainActivityFragment();
+    public static ListPhotosFragment newInstance() {
+        ListPhotosFragment listPhotosFragment = new ListPhotosFragment();
         Bundle args = new Bundle();
-        mainActivityFragment.setArguments(args);
-        return mainActivityFragment;
+        listPhotosFragment.setArguments(args);
+        return listPhotosFragment;
     }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setRetainInstance(true);
         setHasOptionsMenu(true);
-        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
-        ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
         App.getComponent().inject(this);
     }
 
@@ -96,9 +109,9 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
                 (new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
-                        photos.clear();
-                        PAGE = 1;
-                        downloadPhotos.getSearchPhotosFromAPI(query,PAGE,Constants.PER_PAGE);
+                        ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(TITLE_SEARCH + ": " + query);
+                        searchView.onActionViewCollapsed();
+                        startSearch(query);
                         return true;
                     }
                     @Override
@@ -111,7 +124,10 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-
+            case R.id.item_new_photo:
+                ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(TITLE_NEW_PHOTOS);
+                startNewPhotos();
+                break;
             default:
                 break;
         }
@@ -122,9 +138,10 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, view);
         ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
-        ButterKnife.bind(this, view);
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(TITLE_NEW_PHOTOS);
         photoListManager = new GridLayoutManager(getContext(),gridCount);
         photosList.setLayoutManager(photoListManager);
         photosListAdapter = new PhotosListAdapter(photos, getContext());
@@ -150,7 +167,8 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
 
         /**При первом старте приложения загружаем фото с апи*/
         if(!flagFirstStartDevice){
-            downloadPhotos.getPhotosFromAPI(PAGE, Constants.PER_PAGE);
+            firtsStart();
+            startNewPhotos();
             flagFirstStartDevice = true;
         }
 
@@ -159,7 +177,15 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
 
     @OnClick(R.id.btnLoadMore)
     public void onClickLoadMore(){
-        downloadPhotos.getPhotosFromAPI(++PAGE, Constants.PER_PAGE);
+        switch (STATE){
+            case 0: downloadPhotos.getPhotosFromAPI(++PAGE, downloadPhotos.PER_PAGE);
+                break;
+            case 1: downloadPhotos.getSearchPhotosFromAPI(query,++PAGE,downloadPhotos.PER_PAGE);
+                break;
+            default:
+                break;
+        }
+
     }
 
     @Override
@@ -178,12 +204,53 @@ public class MainActivityFragment extends Fragment implements PhotosListAdapter.
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFinishLoadPhoto(FinishLoadPhoto event) {
         this.photos.addAll(event.photos);
+        if(photos.size() == 0){
+            showNoResultsPlaceholder();
+        }else{
+            hideNoResultsPlaceholder();
+        }
         photosListAdapter.notifyDataSetChanged();
     }
     /**Ловим нажатие в списке*/
     @Override
     public void onItemClick(View view, Photo photo, int position) {
         /**Вызываем метод с основного активити для замены фрагмента с фото на полный экран*/
-        ((MainActivityImpl)getActivity()).openPhotoFullScreen(photo.getUrls().getRegular(), photo.getUser().getName());
+        ((MainActivityImpl)getActivity()).openPhotoFullScreen(
+                photo.getUrls().getRegular(),
+                photo.getUser().getName(),
+                photo.getLinks().getHtml(),
+                photo.getId()
+        );
+    }
+
+    public void startSearch(String query){
+        this.query = query;
+        STATE = downloadPhotos.SEARCH;
+        photos.clear();
+        PAGE = 1;
+        downloadPhotos.getSearchPhotosFromAPI(query,PAGE,downloadPhotos.PER_PAGE);
+    }
+
+    public void startNewPhotos(){
+        photos.clear();
+        STATE = downloadPhotos.NEW_PHOTOS;
+        PAGE = 1;
+        downloadPhotos.getPhotosFromAPI(PAGE, downloadPhotos.PER_PAGE);
+    }
+
+    public void firtsStart(){
+        photos.clear();
+        this.photos.addAll(cache.getPhotosFromJson());
+        photosListAdapter.notifyDataSetChanged();
+    }
+
+    public void showNoResultsPlaceholder(){
+        txtNoResults.setVisibility(View.VISIBLE);
+        photosList.setVisibility(View.INVISIBLE);
+    }
+
+    public void hideNoResultsPlaceholder(){
+        txtNoResults.setVisibility(View.INVISIBLE);
+        photosList.setVisibility(View.VISIBLE);
     }
 }

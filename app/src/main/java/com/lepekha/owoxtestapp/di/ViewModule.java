@@ -2,7 +2,9 @@ package com.lepekha.owoxtestapp.di;
 
 import android.support.annotation.NonNull;
 
-import com.lepekha.owoxtestapp.view.MainActivityFragment;
+import com.lepekha.owoxtestapp.presenter.FullScreenMethodImpl;
+import com.lepekha.owoxtestapp.view.FullScreenPhotoFragment;
+import com.lepekha.owoxtestapp.view.ListPhotosFragment;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import javax.inject.Singleton;
@@ -26,7 +28,16 @@ public class ViewModule {
     @Provides
     @Singleton
     @NonNull
-    public MainActivityFragment provideMainActivityFragment(){
-        return new MainActivityFragment();
+    public FullScreenPhotoFragment provideFullScreenPhotoFragment(){
+        return new FullScreenPhotoFragment();
     }
+
+    @Provides
+    @Singleton
+    @NonNull
+    public ListPhotosFragment provideMainActivityFragment(){
+        return new ListPhotosFragment();
+    }
+
+
 }

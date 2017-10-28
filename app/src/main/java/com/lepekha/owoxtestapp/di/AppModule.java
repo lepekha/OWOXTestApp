@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.lepekha.owoxtestapp.Util;
+import com.lepekha.owoxtestapp.model.cache.ImplPreference;
 
 import javax.inject.Singleton;
 
@@ -35,4 +36,12 @@ public class AppModule {
     public Util provideUtil(Context context){
         return new Util(context);
     }
+
+    @Provides
+    @NonNull
+    @Singleton
+    public ImplPreference providePreference(Context context){
+        return new ImplPreference(context);
+    }
+
 }

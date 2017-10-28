@@ -14,10 +14,9 @@ import java.util.List;
  */
 
 public interface DownloadPhotos {
+
     void setView(MainActivityImpl view);
     void getPhotosFromAPI(int page, int per_page);
     void getSearchPhotosFromAPI(String query, int page, int per_page);
-    List<Photo> prepearPhotoToList(int page, List<Photo> photos);
-    void cacheListOfData(List<Photo> photos);
     void errorLoad();
 }

@@ -1,17 +1,10 @@
 package com.lepekha.owoxtestapp.presenter;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.lepekha.owoxtestapp.App;
-import com.lepekha.owoxtestapp.Constants;
-import com.lepekha.owoxtestapp.R;
-import com.lepekha.owoxtestapp.Util;
 import com.lepekha.owoxtestapp.event.FinishLoadPhoto;
+import com.lepekha.owoxtestapp.model.cache.ImplPreference;
 import com.lepekha.owoxtestapp.model.pojo.Photo;
 import com.lepekha.owoxtestapp.model.pojo.SearchPhoto;
 import com.lepekha.owoxtestapp.model.rest.RequestImpl;
@@ -19,11 +12,10 @@ import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
+
 import javax.inject.Inject;
 
-import butterknife.BindString;
 import rx.Observer;
 
 /**
@@ -32,14 +24,17 @@ import rx.Observer;
 
 public class DownloadPhotosImpl implements DownloadPhotos {
 
+    public static final int NEW_PHOTOS = 0;
+    public static final int SEARCH = 1;
+    public static final int PER_PAGE = 30;
+
     @Inject
     RequestImpl requestImpl;
 
     @Inject
-    Util util;
+    ImplPreference cache;
 
-    MainActivityImpl view = null;
-
+    private MainActivityImpl view = null;
 
     public DownloadPhotosImpl() {
         App.getComponent().inject(this);
@@ -69,7 +64,8 @@ public class DownloadPhotosImpl implements DownloadPhotos {
 
                         @Override
                         public void onNext(List<Photo> photos) {
-                            /**Посылаем событие окончания загрузки + данные которые мы получили в фрагмент MainActivityFragment*/
+                            /**Посылаем событие окончания загрузки + данные которые мы получили в фрагмент ListPhotosFragment*/
+                            cache.savePhotosJson(photos);
                             EventBus.getDefault().post(new FinishLoadPhoto(photos));
                             view.hideProgressBar();
                         }
@@ -89,30 +85,18 @@ public class DownloadPhotosImpl implements DownloadPhotos {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("ewq","error "+e);
+                        EventBus.getDefault().post(new FinishLoadPhoto(cache.getPhotosFromJson()));
                         errorLoad();
                     }
 
                     @Override
                     public void onNext(SearchPhoto searchPhotos) {
-                        /**Посылаем событие окончания загрузки + данные которые мы получили в фрагмент MainActivityFragment*/
-                        Log.e("ewq","data " + searchPhotos.getResults().toString());
+                        cache.savePhotosJson(searchPhotos.getResults());
+                        /**Посылаем событие окончания загрузки + данные которые мы получили в фрагмент ListPhotosFragment*/
                         EventBus.getDefault().post(new FinishLoadPhoto(searchPhotos.getResults()));
                         view.hideProgressBar();
                     }
                 });
-    }
-
-    @Override
-    public List<Photo> prepearPhotoToList(int page, List<Photo> photos) {
-        return null;
-    }
-
-    @Override
-    public void cacheListOfData(List<Photo> photos) {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        String temp = gson.toJson(photos);
     }
 
     @Override

@@ -10,5 +10,6 @@ public interface MainActivity {
     void showMessage(String text);
     void showErrorLoadMessage();
     void showErrorLoadFullPhotoMessage();
-    void openPhotoFullScreen(String photoUrl, String thumbneilImage);
+    void showMessageOpenPhoto(String uri);
+    void openPhotoFullScreen(String photoUrl, String thumbneilImage, String photoShareLink, String photoId);
 }

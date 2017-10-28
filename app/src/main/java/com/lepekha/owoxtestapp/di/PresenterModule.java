@@ -1,8 +1,11 @@
 package com.lepekha.owoxtestapp.di;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.lepekha.owoxtestapp.Util;
 import com.lepekha.owoxtestapp.presenter.DownloadPhotosImpl;
+import com.lepekha.owoxtestapp.presenter.FullScreenMethodImpl;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import javax.inject.Singleton;
@@ -21,5 +24,12 @@ public class PresenterModule {
     @NonNull
     public DownloadPhotosImpl provideDownloadPhotosImpl(){
         return new DownloadPhotosImpl();
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    public FullScreenMethodImpl provideFullScreenMethod(){
+        return new FullScreenMethodImpl();
     }
 }
