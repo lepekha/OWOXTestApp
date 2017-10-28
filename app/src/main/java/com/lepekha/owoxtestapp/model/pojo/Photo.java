@@ -6,28 +6,16 @@ package com.lepekha.owoxtestapp.model.pojo;
 /**Обьект для хранения json пришедшего от GET /photos*/
 public class Photo {
     private String id;
-    private String createdAt;
-    private String updatedAt;
-    private int width;
-    private int height;
-    private String color;
-    private long likes;
-    private boolean likedByUser;
-    private String description;
+    private User user;
     private Urls urls;
+    private Links links;
 
 
-    public Photo(String id, String createdAt, String updatedAt, int width, int height, String color, int likes, boolean likedByUser, String description, Urls urls) {
+    public Photo(String id, User user, Urls urls, Links links) {
         this.id = id;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.width = width;
-        this.height = height;
-        this.color = color;
-        this.likes = likes;
-        this.likedByUser = likedByUser;
-        this.description = description;
+        this.user = user;
         this.urls = urls;
+        this.links = links;
     }
 
     public String getId() {
@@ -38,68 +26,12 @@ public class Photo {
         this.id = id;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public User getUser() {
+        return user;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public long getLikes() {
-        return likes;
-    }
-
-    public void setLikes(long likes) {
-        this.likes = likes;
-    }
-
-    public boolean isLikedByUser() {
-        return likedByUser;
-    }
-
-    public void setLikedByUser(boolean likedByUser) {
-        this.likedByUser = likedByUser;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Urls getUrls() {
@@ -110,19 +42,21 @@ public class Photo {
         this.urls = urls;
     }
 
+    public Links getLinks() {
+        return links;
+    }
+
+    public void setLinks(Links links) {
+        this.links = links;
+    }
+
     @Override
     public String toString() {
         return "Photo{" +
                 "id='" + id + '\'' +
-                ", createdAt='" + createdAt + '\'' +
-                ", updatedAt='" + updatedAt + '\'' +
-                ", width=" + width +
-                ", height=" + height +
-                ", color='" + color + '\'' +
-                ", likes=" + likes +
-                ", likedByUser=" + likedByUser +
-                ", description='" + description + '\'' +
+                ", user=" + user +
                 ", urls=" + urls +
+                ", links=" + links +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.lepekha.owoxtestapp.di;
 
+import com.lepekha.owoxtestapp.Util;
 import com.lepekha.owoxtestapp.model.api.APIhelper;
 import com.lepekha.owoxtestapp.model.rest.RequestImpl;
 import com.lepekha.owoxtestapp.presenter.DownloadPhotosImpl;
@@ -16,6 +17,7 @@ import dagger.Component;
 @Singleton
 @Component(modules = {ViewModule.class, ModelModule.class, PresenterModule.class, AppModule.class})
 public interface AppComponent {
+        void inject(Util util);
         void inject(APIhelper apIhelper);
         void inject(RequestImpl requestImpl);
         void inject(DownloadPhotosImpl downloadPhotosImpl);

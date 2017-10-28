@@ -3,6 +3,8 @@ package com.lepekha.owoxtestapp.di;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.lepekha.owoxtestapp.Util;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -27,4 +29,10 @@ public class AppModule {
         return appContext;
     }
 
+    @Provides
+    @NonNull
+    @Singleton
+    public Util provideUtil(Context context){
+        return new Util(context);
+    }
 }

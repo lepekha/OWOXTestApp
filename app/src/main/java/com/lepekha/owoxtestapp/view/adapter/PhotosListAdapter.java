@@ -2,7 +2,6 @@ package com.lepekha.owoxtestapp.view.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import com.lepekha.owoxtestapp.R;
 import com.lepekha.owoxtestapp.model.pojo.Photo;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -21,12 +21,14 @@ import butterknife.ButterKnife;
  * Created by Ruslan on 25.10.2017.
  */
 
-public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.ViewHolder> {
+public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.ViewHolder>{
 
-    private List<Photo> photos;
+    private List<Photo> photos = new ArrayList<>();
     private Context context;
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    private OnItemClickListener onItemClickListener;
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         @BindView(R.id.thumbneilPhoto)
         ImageView imgThumbneilPhoto;
@@ -35,7 +37,21 @@ public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.Vi
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            imgThumbneilPhoto.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            onItemClickListener.onItemClick(view, photos.get(getPosition()), getPosition());
+        }
+    }
+
+    public interface  OnItemClickListener{
+        public void onItemClick(View view, Photo photo, int position);
+    }
+
+    public void setOnItemClick(final OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
     }
 
     public PhotosListAdapter(List<Photo> photos, Context context) {

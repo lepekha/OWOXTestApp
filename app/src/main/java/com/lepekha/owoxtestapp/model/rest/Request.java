@@ -13,5 +13,5 @@ import rx.Observable;
 
 public interface Request {
     Observable<List<Photo>> getPhotos(String page, String per_page);
-    Observable<List<SearchPhoto>> searchPhotos(String query, String page, String per_page);
+    Observable<SearchPhoto> searchPhotos(String query, String page, String per_page);
 }

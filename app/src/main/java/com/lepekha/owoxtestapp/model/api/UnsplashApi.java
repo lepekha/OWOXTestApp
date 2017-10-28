@@ -24,5 +24,5 @@ public interface UnsplashApi {
 
     @Headers("Authorization: Client-ID 4275b644cd96756e752c6d8ef8ca40d8352537f092fc4f9433bde060008e139e")
     @GET("search/photos")
-    Observable<List<SearchPhoto>> searchPhotos(@Query("query") String query, @Query("page") String page, @Query("per_page") String per_page);
+    Observable<SearchPhoto> searchPhotos(@Query("query") String query, @Query("page") String page, @Query("per_page") String per_page);
 }

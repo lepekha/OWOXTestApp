@@ -5,4 +5,10 @@ package com.lepekha.owoxtestapp.view;
  */
 
 public interface MainActivity {
+    void showProgressBar();
+    void hideProgressBar();
+    void showMessage(String text);
+    void showErrorLoadMessage();
+    void showErrorLoadFullPhotoMessage();
+    void openPhotoFullScreen(String photoUrl, String thumbneilImage);
 }

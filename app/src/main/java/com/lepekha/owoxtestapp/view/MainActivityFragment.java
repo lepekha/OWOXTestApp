@@ -5,8 +5,12 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,11 +35,12 @@ import javax.inject.Inject;
 import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Фрагмент для отображения списка фотографий загруженных с АПИ
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements PhotosListAdapter.OnItemClickListener  {
 
     private int PAGE = 1;
 
@@ -48,7 +53,14 @@ public class MainActivityFragment extends Fragment {
     @BindView(R.id.btnLoadMore)
     Button btnLoadMore;
 
-    private RecyclerView.Adapter photosListAdapter;
+    private boolean flagFirstStartDevice = false;
+
+    public static final String FRAGMENT_NAME = "fragment_photos_list";
+    public static final String FULL_SCREEN_FRAGMENT_NAME = "fragment_full_screen";
+    private static final int ANIM_SHOW_TRANSLATION_Y = -50;
+    private static final int ANIM_HIDE_TRANSLATION_Y = 150;
+
+    private PhotosListAdapter photosListAdapter;
     private RecyclerView.LayoutManager photoListManager;
 
     /**Список в котором хранятся обьекты на фото вместе со ссылками*/
@@ -56,30 +68,70 @@ public class MainActivityFragment extends Fragment {
 
     @BindInt(R.integer.gridCount) int gridCount;
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-        App.getComponent().inject(this);
-    }
-
-    public static MainActivityFragment newInstance(){
+    public static MainActivityFragment newInstance() {
         MainActivityFragment mainActivityFragment = new MainActivityFragment();
         Bundle args = new Bundle();
         mainActivityFragment.setArguments(args);
         return mainActivityFragment;
+    }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setRetainInstance(true);
+        setHasOptionsMenu(true);
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
+        App.getComponent().inject(this);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener
+                (new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        photos.clear();
+                        PAGE = 1;
+                        downloadPhotos.getSearchPhotosFromAPI(query,PAGE,Constants.PER_PAGE);
+                        return true;
+                    }
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        return false;
+                    }
+                });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         ButterKnife.bind(this, view);
         photoListManager = new GridLayoutManager(getContext(),gridCount);
         photosList.setLayoutManager(photoListManager);
         photosListAdapter = new PhotosListAdapter(photos, getContext());
+        photosListAdapter.setOnItemClick(this);
         photosList.setAdapter(photosListAdapter);
+
+        btnLoadMore.setVisibility(View.GONE);//убираем кнопку Загрузки остальных фото при старте
 
         photosList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -87,19 +139,33 @@ public class MainActivityFragment extends Fragment {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(1)) {
                     btnLoadMore.setVisibility(View.VISIBLE);
+                    btnLoadMore.animate().translationY(ANIM_SHOW_TRANSLATION_Y);
+
                 }else {
-                    btnLoadMore.setVisibility(View.GONE);
+                    btnLoadMore.animate().translationY(ANIM_HIDE_TRANSLATION_Y);
+
                 }
             }
         });
+
+        /**При первом старте приложения загружаем фото с апи*/
+        if(!flagFirstStartDevice){
+            downloadPhotos.getPhotosFromAPI(PAGE, Constants.PER_PAGE);
+            flagFirstStartDevice = true;
+        }
+
         return view;
+    }
+
+    @OnClick(R.id.btnLoadMore)
+    public void onClickLoadMore(){
+        downloadPhotos.getPhotosFromAPI(++PAGE, Constants.PER_PAGE);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        downloadPhotos.getPhotosFromAPI(PAGE, Constants.PER_PAGE);
     }
 
     @Override
@@ -108,9 +174,16 @@ public class MainActivityFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
+    /**Если загрузка фото закончена обрабатываем событие*/
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFinishLoadPhoto(FinishLoadPhoto event) {
         this.photos.addAll(event.photos);
         photosListAdapter.notifyDataSetChanged();
+    }
+    /**Ловим нажатие в списке*/
+    @Override
+    public void onItemClick(View view, Photo photo, int position) {
+        /**Вызываем метод с основного активити для замены фрагмента с фото на полный экран*/
+        ((MainActivityImpl)getActivity()).openPhotoFullScreen(photo.getUrls().getRegular(), photo.getUser().getName());
     }
 }

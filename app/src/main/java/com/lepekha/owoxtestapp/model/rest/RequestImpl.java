@@ -36,7 +36,7 @@ public class RequestImpl implements Request {
     }
 
     @Override
-    public Observable<List<SearchPhoto>> searchPhotos(String query, String page, String per_page) {
+    public Observable<SearchPhoto> searchPhotos(String query, String page, String per_page) {
         return unsplashApi
                 .searchPhotos(query, page, per_page)
                 .compose(RxUtil.applyIOToMainThreadSchedulers());

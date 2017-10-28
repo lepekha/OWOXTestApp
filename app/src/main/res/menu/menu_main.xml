@@ -8,4 +8,10 @@
         android:title="Search"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/item_new_photo"
+        android:icon="@drawable/ic_fiber_new_white_24px"
+        android:title="New photos"
+        android:visible="true"
+        app:showAsAction="always" />
 </menu>
