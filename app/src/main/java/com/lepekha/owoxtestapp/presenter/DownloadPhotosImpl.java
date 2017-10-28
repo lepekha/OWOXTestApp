@@ -59,6 +59,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
 
                         @Override
                         public void onError(Throwable e) {
+                            EventBus.getDefault().post(new FinishLoadPhoto(cache.getPhotosFromJson()));
                             errorLoad();
                         }
 

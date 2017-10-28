@@ -125,6 +125,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.item_new_photo:
+                photos.clear();
                 ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(TITLE_NEW_PHOTOS);
                 startNewPhotos();
                 break;
@@ -165,11 +166,11 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
             }
         });
 
+
         /**При первом старте приложения загружаем фото с апи*/
         if(!flagFirstStartDevice){
-            firtsStart();
             startNewPhotos();
-            flagFirstStartDevice = true;
+
         }
 
         return view;
@@ -203,7 +204,14 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     /**Если загрузка фото закончена обрабатываем событие*/
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFinishLoadPhoto(FinishLoadPhoto event) {
-        this.photos.addAll(event.photos);
+        if(!flagFirstStartDevice){
+            photos.clear();
+            this.photos.addAll(event.photos);
+            flagFirstStartDevice = true;
+        }else{
+            this.photos.addAll(event.photos);
+        }
+
         if(photos.size() == 0){
             showNoResultsPlaceholder();
         }else{
@@ -232,14 +240,14 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     }
 
     public void startNewPhotos(){
-        photos.clear();
+        firtsStart();
         STATE = downloadPhotos.NEW_PHOTOS;
         PAGE = 1;
         downloadPhotos.getPhotosFromAPI(PAGE, downloadPhotos.PER_PAGE);
     }
 
     public void firtsStart(){
-        photos.clear();
+       // photos.clear();
         this.photos.addAll(cache.getPhotosFromJson());
         photosListAdapter.notifyDataSetChanged();
     }
