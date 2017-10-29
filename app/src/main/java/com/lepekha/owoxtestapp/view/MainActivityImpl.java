@@ -10,24 +10,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
-
 import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.R;
 import com.lepekha.owoxtestapp.presenter.DownloadPhotosImpl;
 import com.lepekha.owoxtestapp.presenter.FullScreenMethodImpl;
-
 import javax.inject.Inject;
-
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**Главное Активити с содержание фрагментов*/
 public class MainActivityImpl extends AppCompatActivity implements MainActivity{
 
-    FragmentManager fragmentManager = getSupportFragmentManager();
+    private FragmentManager fragmentManager = getSupportFragmentManager();
 
-    ListPhotosFragment listPhotosFragment = null;
-    FullScreenPhotoFragment fullScreenPhotoFragment = null;
+    private ListPhotosFragment listPhotosFragment = null;
+    private FullScreenPhotoFragment fullScreenPhotoFragment = null;
 
     @Inject
     DownloadPhotosImpl downloadPhotos;
@@ -40,6 +38,9 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
 
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
+
+    @BindString(R.string.snackbar_load_new_photos)
+    String SNACKBAR_LOAD_NEW_PHOTO;
 
     @BindString(R.string.snackbar_load_error)
     String SNACKBAR_LOAD_ERROR;
@@ -58,6 +59,7 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
         App.getComponent().inject(this);
         downloadPhotos.setView(this);//присваеваем вьею для вызова методов с презентера DownloadPhotos
         fullScreenMethod.setView(this);//присваеваем вьею для вызова методов с презентера FullScreenMethod
+        /**Добавляем Фрагмент со списком фото*/
         listPhotosFragment = (ListPhotosFragment) fragmentManager.findFragmentByTag(ListPhotosFragment.FRAGMENT_NAME);
         if(listPhotosFragment == null) {
             listPhotosFragment = ListPhotosFragment.newInstance();
@@ -84,6 +86,11 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
     }
 
     @Override
+    public void showLoadNewPhotos() {
+        showMessage(SNACKBAR_LOAD_NEW_PHOTO);
+    }
+
+    @Override
     public void showErrorLoadMessage() {
         showMessage(SNACKBAR_LOAD_ERROR);
     }
@@ -98,6 +105,7 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
         Snackbar.make(conteiner,"Photo has been saved", Snackbar.LENGTH_SHORT).setAction("Open", new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /**Предлагаем открыть фото которое сохранили с помощью сторонних программ*/
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
             }
         }).show();
@@ -105,6 +113,7 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
 
     @Override
     public void openPhotoFullScreen(String photoUrl, String name, String photoShareLink, String photoId) {
+        /**Добавляем Фрагмент с полноразмерным фото*/
         fullScreenPhotoFragment = (FullScreenPhotoFragment) fragmentManager.findFragmentByTag(FullScreenPhotoFragment.FRAGMENT_NAME);
         if(fullScreenPhotoFragment == null) {
             fullScreenPhotoFragment = FullScreenPhotoFragment.newInstance(photoUrl, name, photoShareLink, photoId);
