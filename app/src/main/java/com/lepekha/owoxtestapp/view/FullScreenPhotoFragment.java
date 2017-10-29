@@ -3,7 +3,6 @@ package com.lepekha.owoxtestapp.view;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -15,24 +14,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.R;
 import com.lepekha.owoxtestapp.presenter.FullScreenMethodImpl;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
-
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by Ruslan on 24.08.2016.
+ * Фрагмент отображения фото на весь экран
  */
 
 public class FullScreenPhotoFragment extends DialogFragment {
@@ -51,7 +46,7 @@ public class FullScreenPhotoFragment extends DialogFragment {
     @Inject
     FullScreenMethodImpl fullScreenMethod;
 
-    public static final int MULTIPLE_PERMISSIONS = 1; // code you want.
+    public static final int MULTIPLE_PERMISSIONS = 1;
     private static final String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
     public static final String FRAGMENT_NAME = "fragment_full_screen";
 
@@ -119,6 +114,7 @@ public class FullScreenPhotoFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.full_screen_photo, conteiner, false);
         ButterKnife.bind(this, view);
         ((MainActivityImpl) getActivity()).showProgressBar();
+        /**Загружаем фото в полный размер*/
         Picasso.with(getContext()).load(photoUrl).placeholder(R.drawable.ic_photo_camera_white_24px).into(imgPhotoFullScreen, new Callback() {
             @Override
             public void onSuccess() {
@@ -136,6 +132,7 @@ public class FullScreenPhotoFragment extends DialogFragment {
         return view;
     }
 
+    /**Запрос разрешения для сохранения фото на устройство*/
     public boolean checkPermissions() {
         int result;
         List<String> listPermissionsNeeded = new ArrayList<>();

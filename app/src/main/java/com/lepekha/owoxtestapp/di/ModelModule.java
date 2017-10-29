@@ -3,9 +3,7 @@ package com.lepekha.owoxtestapp.di;
 import android.support.annotation.NonNull;
 
 import com.lepekha.owoxtestapp.model.api.APIhelper;
-import com.lepekha.owoxtestapp.model.api.UnsplashApi;
 import com.lepekha.owoxtestapp.model.rest.RequestImpl;
-import com.lepekha.owoxtestapp.view.MainActivityImpl;
 
 import javax.inject.Singleton;
 

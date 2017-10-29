@@ -1,7 +1,7 @@
 package com.lepekha.owoxtestapp.model.pojo;
 
 /**
- * Created by Ruslan on 28.10.2017.
+ * Обьект для хранения ссылок на фото
  */
 
 public class Links {

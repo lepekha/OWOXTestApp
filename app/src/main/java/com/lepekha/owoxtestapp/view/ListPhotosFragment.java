@@ -3,6 +3,7 @@ package com.lepekha.owoxtestapp.view;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -18,7 +19,7 @@ import android.widget.TextView;
 import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.R;
 import com.lepekha.owoxtestapp.event.FinishLoadPhoto;
-import com.lepekha.owoxtestapp.model.cache.ImplPreference;
+import com.lepekha.owoxtestapp.model.cache.PreferenceImpl;
 import com.lepekha.owoxtestapp.model.pojo.Photo;
 import com.lepekha.owoxtestapp.presenter.DownloadPhotosImpl;
 import com.lepekha.owoxtestapp.view.adapter.PhotosListAdapter;
@@ -41,7 +42,7 @@ import butterknife.OnClick;
 /**
  * Фрагмент для отображения списка фотографий загруженных с АПИ
  */
-public class ListPhotosFragment extends Fragment implements PhotosListAdapter.OnItemClickListener  {
+public class ListPhotosFragment extends Fragment implements PhotosListAdapter.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener  {
 
     private int PAGE = 1;
     private int STATE = 0;
@@ -52,6 +53,9 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
 
     @BindView(R.id.photos_list)
     RecyclerView photosList;
+
+    @BindView(R.id.swipe_list_photos)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.btnLoadMore)
     Button btnLoadMore;
@@ -66,12 +70,12 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     String TITLE_SEARCH;
 
     @Inject
-    ImplPreference cache;
+    PreferenceImpl cache;
 
     private boolean flagFirstStartDevice = false;
+    private boolean flagItemNewPhotosClick = false;
 
     public static final String FRAGMENT_NAME = "fragment_photos_list";
-    public static final String FULL_SCREEN_FRAGMENT_NAME = "fragment_full_screen";
     private static final int ANIM_SHOW_TRANSLATION_Y = -50;
     private static final int ANIM_HIDE_TRANSLATION_Y = 150;
 
@@ -81,6 +85,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     /**Список в котором хранятся обьекты на фото вместе со ссылками*/
     private List<Photo> photos = new ArrayList<>();
 
+    /**Размер сетки в списке, портретный режим - 3, ландшафтный - 5*/
     @BindInt(R.integer.gridCount) int gridCount;
 
     public static ListPhotosFragment newInstance() {
@@ -111,7 +116,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
                     public boolean onQueryTextSubmit(String query) {
                         ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(TITLE_SEARCH + ": " + query);
                         searchView.onActionViewCollapsed();
-                        startSearch(query);
+                        startSearchPhotos(query);
                         return true;
                     }
                     @Override
@@ -125,8 +130,9 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.item_new_photo:
-                photos.clear();
+                flagItemNewPhotosClick = false;
                 ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(TITLE_NEW_PHOTOS);
+                loadPhotosFromCache();
                 startNewPhotos();
                 break;
             default:
@@ -151,6 +157,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
 
         btnLoadMore.setVisibility(View.GONE);//убираем кнопку Загрузки остальных фото при старте
 
+        /**Если список пролистан до конца, делаем видимой кнопку загрузки следующей порции данных*/
         photosList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -158,19 +165,20 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
                 if (!recyclerView.canScrollVertically(1)) {
                     btnLoadMore.setVisibility(View.VISIBLE);
                     btnLoadMore.animate().translationY(ANIM_SHOW_TRANSLATION_Y);
-
                 }else {
                     btnLoadMore.animate().translationY(ANIM_HIDE_TRANSLATION_Y);
-
                 }
             }
         });
+
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                R.color.colorAccent);
 
 
         /**При первом старте приложения загружаем фото с апи*/
         if(!flagFirstStartDevice){
             startNewPhotos();
-
         }
 
         return view;
@@ -204,13 +212,18 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     /**Если загрузка фото закончена обрабатываем событие*/
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFinishLoadPhoto(FinishLoadPhoto event) {
-        if(!flagFirstStartDevice){
+        /**Если событие пришло от нажатия кнопки меню*/
+        if(!flagItemNewPhotosClick){
             photos.clear();
             this.photos.addAll(event.photos);
-            flagFirstStartDevice = true;
+            flagItemNewPhotosClick = true;
+            ((MainActivityImpl)getActivity()).showLoadNewPhotos();
         }else{
             this.photos.addAll(event.photos);
         }
+
+        /**Если событие пришло после первого запуска программы*/
+        if (!flagFirstStartDevice) flagFirstStartDevice = true;
 
         if(photos.size() == 0){
             showNoResultsPlaceholder();
@@ -231,25 +244,22 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
         );
     }
 
-    public void startSearch(String query){
+    public void startSearchPhotos(String query){
         this.query = query;
-        STATE = downloadPhotos.SEARCH;
         photos.clear();
+        STATE = downloadPhotos.SEARCH;
         PAGE = 1;
         downloadPhotos.getSearchPhotosFromAPI(query,PAGE,downloadPhotos.PER_PAGE);
     }
 
     public void startNewPhotos(){
-        firtsStart();
+        photos.clear();
+        if (!flagFirstStartDevice){
+            loadPhotosFromCache();
+        }
         STATE = downloadPhotos.NEW_PHOTOS;
         PAGE = 1;
         downloadPhotos.getPhotosFromAPI(PAGE, downloadPhotos.PER_PAGE);
-    }
-
-    public void firtsStart(){
-       // photos.clear();
-        this.photos.addAll(cache.getPhotosFromJson());
-        photosListAdapter.notifyDataSetChanged();
     }
 
     public void showNoResultsPlaceholder(){
@@ -260,5 +270,22 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     public void hideNoResultsPlaceholder(){
         txtNoResults.setVisibility(View.INVISIBLE);
         photosList.setVisibility(View.VISIBLE);
+    }
+
+    public void loadPhotosFromCache(){
+        if (cache.getPhotosFromJson()!=null){
+            this.photos.addAll(cache.getPhotosFromJson());
+            photosListAdapter.notifyDataSetChanged();
+        }
+    }
+    /**Свайп по списку для получения новых данных*/
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(false);
+        if (STATE == downloadPhotos.NEW_PHOTOS){
+            flagItemNewPhotosClick = false;
+            loadPhotosFromCache();
+            startNewPhotos();
+        }
     }
 }

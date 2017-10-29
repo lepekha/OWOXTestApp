@@ -20,7 +20,7 @@ import java.util.List;
 
 
 
-public class ImplPreference implements Preference {
+public class PreferenceImpl implements Preference {
 
     private static final String APP_PREFERENCES = "owox_test_app_cache";
     private static final String APP_PREFERENCES_JSON = "saved_photos_json";
@@ -28,11 +28,12 @@ public class ImplPreference implements Preference {
 
     private SharedPreferences mSettings;
 
-    public ImplPreference(Context context) {
+    public PreferenceImpl(Context context) {
         App.getComponent().inject(this);
         mSettings = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
     }
 
+    /**Сохраняем список фото в виде строки json*/
     @Override
     public void savePhotosJson(List<Photo> photos) {
         GsonBuilder builder = new GsonBuilder();
@@ -41,6 +42,7 @@ public class ImplPreference implements Preference {
         getPhotosFromJson();
     }
 
+    /**Получаем список фото со строки json*/
     @Override
     public List<Photo> getPhotosFromJson() {
         GsonBuilder builder = new GsonBuilder();
