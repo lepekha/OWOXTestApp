@@ -1,10 +1,8 @@
 package com.lepekha.owoxtestapp.presenter;
 
-import android.util.Log;
-
 import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.event.FinishLoadPhoto;
-import com.lepekha.owoxtestapp.model.cache.ImplPreference;
+import com.lepekha.owoxtestapp.model.cache.PreferenceImpl;
 import com.lepekha.owoxtestapp.model.pojo.Photo;
 import com.lepekha.owoxtestapp.model.pojo.SearchPhoto;
 import com.lepekha.owoxtestapp.model.rest.RequestImpl;
@@ -19,7 +17,7 @@ import javax.inject.Inject;
 import rx.Observer;
 
 /**
- * Created by Ruslan on 25.10.2017.
+ * Класс для загрузки Новых фото и поиска фото по запросу
  */
 
 public class DownloadPhotosImpl implements DownloadPhotos {
@@ -32,7 +30,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
     RequestImpl requestImpl;
 
     @Inject
-    ImplPreference cache;
+    PreferenceImpl cache;
 
     private MainActivityImpl view = null;
 
@@ -45,6 +43,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
         this.view = view;
     }
 
+    /**Загружаем список фото с сервера /photos*/
     @Override
     public void getPhotosFromAPI(int page, int per_page) {
         view.showProgressBar();
@@ -73,6 +72,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
                     });
     }
 
+    /**Загружаем список фото с сервера /search/photos*/
     @Override
     public void getSearchPhotosFromAPI(String query, int page, int per_page) {
         view.showProgressBar();
@@ -86,13 +86,11 @@ public class DownloadPhotosImpl implements DownloadPhotos {
 
                     @Override
                     public void onError(Throwable e) {
-                        EventBus.getDefault().post(new FinishLoadPhoto(cache.getPhotosFromJson()));
                         errorLoad();
                     }
 
                     @Override
                     public void onNext(SearchPhoto searchPhotos) {
-                        cache.savePhotosJson(searchPhotos.getResults());
                         /**Посылаем событие окончания загрузки + данные которые мы получили в фрагмент ListPhotosFragment*/
                         EventBus.getDefault().post(new FinishLoadPhoto(searchPhotos.getResults()));
                         view.hideProgressBar();

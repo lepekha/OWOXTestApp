@@ -3,21 +3,9 @@ package com.lepekha.owoxtestapp.presenter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
-
 import com.lepekha.owoxtestapp.App;
-import com.lepekha.owoxtestapp.Util;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import javax.inject.Inject;
 
 /**
  * Created by Ruslan on 28.10.2017.
@@ -25,11 +13,7 @@ import javax.inject.Inject;
 
 public class FullScreenMethodImpl implements FullScreenMethod {
 
-    @Inject
-    Util util;
-
     private MainActivityImpl view = null;
-
 
     public FullScreenMethodImpl() {
         App.getComponent().inject(this);
@@ -40,6 +24,7 @@ public class FullScreenMethodImpl implements FullScreenMethod {
         this.view = view;
     }
 
+    /**Метод для отправки html ссылки на фото*/
     @Override
     public void shareCurrentPhoto(Context context, String header, String message) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -52,6 +37,7 @@ public class FullScreenMethodImpl implements FullScreenMethod {
     }
 
 
+    /**Метод для сохранения загруженной фотографии на устройство*/
     @Override
     public void saveCurrentPhoto(Context context, Bitmap bmp, String photoId) {
             String imgSaved = MediaStore.Images.Media.insertImage(
@@ -59,12 +45,4 @@ public class FullScreenMethodImpl implements FullScreenMethod {
                     photoId + ".jpg", "drawing");
             view.showMessageOpenPhoto(imgSaved);
     }
-
-    private static void scanFile(Context context, Uri imageUri){
-        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        scanIntent.setData(imageUri);
-
-
-    }
-
 }

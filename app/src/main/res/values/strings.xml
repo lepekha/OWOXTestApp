@@ -1,14 +1,16 @@
 <resources>
     <string name="app_name">Unsplash Gallery</string>
-    <string name="action_settings">Settings</string>
+    <string name="search_photo_no_results">No results</string>
+
     <string name="snackbar_load_error">Error loading new data.</string>
-    <string name="snackbar_load_error_full_screen_photo">Error loading photo</string>
+    <string name="snackbar_load_error_full_screen_photo">Error loading photo.</string>
+    <string name="snackbar_load_new_photos">New photos loaded.</string>
+
     <string name="toolbar_author_full_screen_photo_fragment">Author:</string>
+
     <string name="menu_search">Search</string>
     <string name="menu_new_photos">New photos</string>
     <string name="menu_share">Share</string>
     <string name="menu_save">Save</string>
     <string name="menu_share_message">Share via</string>
-    <string name="search_photo_no_results">No Results</string>
-
 </resources>

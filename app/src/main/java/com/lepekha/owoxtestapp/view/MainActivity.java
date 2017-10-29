@@ -9,6 +9,7 @@ public interface MainActivity {
     void hideProgressBar();
     void showMessage(String text);
     void showErrorLoadMessage();
+    void showLoadNewPhotos();
     void showErrorLoadFullPhotoMessage();
     void showMessageOpenPhoto(String uri);
     void openPhotoFullScreen(String photoUrl, String thumbneilImage, String photoShareLink, String photoId);

@@ -1,14 +1,10 @@
 package com.lepekha.owoxtestapp.di;
 
 import android.support.annotation.NonNull;
-
-import com.lepekha.owoxtestapp.presenter.FullScreenMethodImpl;
 import com.lepekha.owoxtestapp.view.FullScreenPhotoFragment;
 import com.lepekha.owoxtestapp.view.ListPhotosFragment;
 import com.lepekha.owoxtestapp.view.MainActivityImpl;
-
 import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 
