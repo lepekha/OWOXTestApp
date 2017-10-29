@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Unsplash Gallery</string>
-    <string name="search_photo_no_results">No Results</string>
+    <string name="search_photo_no_results">No results</string>
 
     <string name="snackbar_load_error">Error loading new data.</string>
-    <string name="snackbar_load_error_full_screen_photo">Error loading photo</string>
-    <string name="snackbar_load_new_photos">Load new photos</string>
+    <string name="snackbar_load_error_full_screen_photo">Error loading photo.</string>
+    <string name="snackbar_load_new_photos">New photos loaded.</string>
 
     <string name="toolbar_author_full_screen_photo_fragment">Author:</string>
 
