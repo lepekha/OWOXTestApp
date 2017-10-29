@@ -24,6 +24,7 @@ public class PreferenceImpl implements Preference {
 
     private static final String APP_PREFERENCES = "owox_test_app_cache";
     private static final String APP_PREFERENCES_JSON = "saved_photos_json";
+    private static final String APP_PREFERENCES_USE_CACHE = "use_cache";
 
 
     private SharedPreferences mSettings;
@@ -50,6 +51,16 @@ public class PreferenceImpl implements Preference {
         List<Photo> photos = new ArrayList<>();
         photos = gson.fromJson(mSettings.getString(APP_PREFERENCES_JSON, ""),new TypeToken<List<Photo>>(){}.getType());
         return photos;
+    }
+
+    @Override
+    public void setUseCache(boolean useCache) {
+        mSettings.edit().putBoolean(APP_PREFERENCES_USE_CACHE, useCache).apply();
+    }
+
+    @Override
+    public boolean getUseCache() {
+        return mSettings.getBoolean(APP_PREFERENCES_USE_CACHE, false);
     }
 }
 

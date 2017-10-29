@@ -11,4 +11,6 @@ import java.util.List;
 public interface Preference {
     void savePhotosJson(List<Photo> photos);
     List<Photo> getPhotosFromJson();
+    void setUseCache(boolean useCache);
+    boolean getUseCache();
 }

@@ -1,5 +1,7 @@
 package com.lepekha.owoxtestapp.presenter;
 
+import android.util.Log;
+
 import com.lepekha.owoxtestapp.App;
 import com.lepekha.owoxtestapp.event.FinishLoadPhoto;
 import com.lepekha.owoxtestapp.model.cache.PreferenceImpl;
@@ -58,15 +60,14 @@ public class DownloadPhotosImpl implements DownloadPhotos {
 
                         @Override
                         public void onError(Throwable e) {
-                            EventBus.getDefault().post(new FinishLoadPhoto(cache.getPhotosFromJson()));
                             errorLoad();
                         }
 
                         @Override
                         public void onNext(List<Photo> photos) {
-                            /**Посылаем событие окончания загрузки + данные которые мы получили в фрагмент ListPhotosFragment*/
-                            cache.savePhotosJson(photos);
-                            EventBus.getDefault().post(new FinishLoadPhoto(photos));
+                            cache.savePhotosJson(photos);//сохраняем список фото в кеш
+                            cache.setUseCache(true);// = true - Если собылие не будет получено то используем сохраненный кеш
+                            EventBus.getDefault().post(new FinishLoadPhoto(photos)); //Посылаем событие окончания загрузки + данные которые мы получили в фрагмент ListPhotosFragment
                             view.hideProgressBar();
                         }
                     });
@@ -92,7 +93,9 @@ public class DownloadPhotosImpl implements DownloadPhotos {
                     @Override
                     public void onNext(SearchPhoto searchPhotos) {
                         /**Посылаем событие окончания загрузки + данные которые мы получили в фрагмент ListPhotosFragment*/
-                        EventBus.getDefault().post(new FinishLoadPhoto(searchPhotos.getResults()));
+                        cache.savePhotosJson(searchPhotos.getResults());//сохраняем список фото в кеш
+                        cache.setUseCache(true);// = true - Если собылие не будет получено то используем сохраненный кеш
+                        EventBus.getDefault().post(new FinishLoadPhoto(searchPhotos.getResults()));//Посылаем событие окончания загрузки + данные которые мы получили в фрагмент ListPhotosFragment
                         view.hideProgressBar();
                     }
                 });

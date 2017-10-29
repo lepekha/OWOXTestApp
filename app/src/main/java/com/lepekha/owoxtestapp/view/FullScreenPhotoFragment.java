@@ -46,9 +46,12 @@ public class FullScreenPhotoFragment extends DialogFragment {
     @Inject
     FullScreenMethodImpl fullScreenMethod;
 
+    Picasso picasso;
+
     public static final int MULTIPLE_PERMISSIONS = 1;
     private static final String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
     public static final String FRAGMENT_NAME = "fragment_full_screen";
+    public static final String PICASSO_FULL_SCREEN_TAG = "picasso_full_screen_tag";
 
 
     public static FullScreenPhotoFragment newInstance(String photoUrl, String name, String photoShareLink, String photoId) {
@@ -102,9 +105,7 @@ public class FullScreenPhotoFragment extends DialogFragment {
         name = getArguments().getString("name");
         photoShareLink = getArguments().getString("photoShareLink");
         photoId = getArguments().getString("photoId");
-        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(getString(R.string.toolbar_author_full_screen_photo_fragment) + " " + name);
+
 
     }
 
@@ -114,8 +115,12 @@ public class FullScreenPhotoFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.full_screen_photo, conteiner, false);
         ButterKnife.bind(this, view);
         ((MainActivityImpl) getActivity()).showProgressBar();
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(getString(R.string.toolbar_author_full_screen_photo_fragment) + " " + name);
         /**Загружаем фото в полный размер*/
-        Picasso.with(getContext()).load(photoUrl).placeholder(R.drawable.ic_photo_camera_white_24px).into(imgPhotoFullScreen, new Callback() {
+        picasso = Picasso.with(getContext());
+        picasso.load(photoUrl).tag(PICASSO_FULL_SCREEN_TAG).placeholder(R.drawable.ic_image_black_24dp).error(R.drawable.ic_error_black_24dp).into(imgPhotoFullScreen, new Callback() {
             @Override
             public void onSuccess() {
                 ((MainActivityImpl) getActivity()).hideProgressBar();
@@ -127,9 +132,16 @@ public class FullScreenPhotoFragment extends DialogFragment {
                 ((MainActivityImpl) getActivity()).hideProgressBar();
             }
         });
-        imgPhotoFullScreen.setDrawingCacheEnabled(true);
 
+        imgPhotoFullScreen.setDrawingCacheEnabled(true);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        picasso.cancelTag(PICASSO_FULL_SCREEN_TAG);
+        ((MainActivityImpl) getActivity()).hideProgressBar();
     }
 
     /**Запрос разрешения для сохранения фото на устройство*/

@@ -1,5 +1,6 @@
 package com.lepekha.owoxtestapp.view;
 
+import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -94,6 +96,33 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
         listPhotosFragment.setArguments(args);
         return listPhotosFragment;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        /**Если приложение было в фоне и не смогло получить событие загрузки данных,
+         * загружаем закешированые данные*/
+        if (cache.getUseCache()){
+            if(PAGE <= 1) photos.clear(); //Если это первая страница то чистим от предыдущих данных
+            photos.addAll(cache.getPhotosFromJson());
+            photosListAdapter.notifyDataSetChanged();
+            cache.setUseCache(false);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +161,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
             case R.id.item_new_photo:
                 flagItemNewPhotosClick = false;
                 ((MainActivityImpl) getActivity()).getSupportActionBar().setTitle(TITLE_NEW_PHOTOS);
-                loadPhotosFromCache();
+                loadPhotosFromCache();//Если по каким то причинам данные не пришли, выводим прошлые данные с кеша
                 startNewPhotos();
                 break;
             default:
@@ -175,10 +204,12 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorAccent);
 
-
-        /**При первом старте приложения загружаем фото с апи*/
+        /**При первом старте приложения загрудаем Кеш последнего сеанса и
+         * начинаем грузить свежие данные*/
         if(!flagFirstStartDevice){
-            startNewPhotos();
+            loadPhotosFromCache();//Если по каким то причинам данные не пришли, выводим прошлые данные с кеша
+            downloadPhotos.getPhotosFromAPI(PAGE, downloadPhotos.PER_PAGE);
+            flagFirstStartDevice = true;
         }
 
         return view;
@@ -197,34 +228,23 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
 
     /**Если загрузка фото закончена обрабатываем событие*/
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFinishLoadPhoto(FinishLoadPhoto event) {
-        /**Если событие пришло от нажатия кнопки меню*/
+        cache.setUseCache(false);
+        //Показываем сообщение получения свежих данных
         if(!flagItemNewPhotosClick){
-            photos.clear();
-            this.photos.addAll(event.photos);
             flagItemNewPhotosClick = true;
             ((MainActivityImpl)getActivity()).showLoadNewPhotos();
-        }else{
-            this.photos.addAll(event.photos);
         }
 
-        /**Если событие пришло после первого запуска программы*/
-        if (!flagFirstStartDevice) flagFirstStartDevice = true;
+        if(PAGE <= 1) photos.clear();  //Если это первая страница то чистим от предыдущих данных
 
+        this.photos.addAll(event.photos);
+
+        //если фото не найдены показываем placeholder
         if(photos.size() == 0){
             showNoResultsPlaceholder();
         }else{
@@ -235,7 +255,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     /**Ловим нажатие в списке*/
     @Override
     public void onItemClick(View view, Photo photo, int position) {
-        /**Вызываем метод с основного активити для замены фрагмента с фото на полный экран*/
+        //Вызываем метод с основного активити для замены фрагмента с фото на полный экран
         ((MainActivityImpl)getActivity()).openPhotoFullScreen(
                 photo.getUrls().getRegular(),
                 photo.getUser().getName(),
@@ -244,19 +264,15 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
         );
     }
 
+    /**Поиск фото*/
     public void startSearchPhotos(String query){
         this.query = query;
-        photos.clear();
         STATE = downloadPhotos.SEARCH;
         PAGE = 1;
         downloadPhotos.getSearchPhotosFromAPI(query,PAGE,downloadPhotos.PER_PAGE);
     }
-
+    /**Получение свежих фото*/
     public void startNewPhotos(){
-        photos.clear();
-        if (!flagFirstStartDevice){
-            loadPhotosFromCache();
-        }
         STATE = downloadPhotos.NEW_PHOTOS;
         PAGE = 1;
         downloadPhotos.getPhotosFromAPI(PAGE, downloadPhotos.PER_PAGE);
@@ -273,6 +289,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     }
 
     public void loadPhotosFromCache(){
+        photos.clear();
         if (cache.getPhotosFromJson()!=null){
             this.photos.addAll(cache.getPhotosFromJson());
             photosListAdapter.notifyDataSetChanged();
@@ -283,8 +300,9 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (STATE == downloadPhotos.NEW_PHOTOS){
-            flagItemNewPhotosClick = false;
-            loadPhotosFromCache();
+            flagItemNewPhotosClick = false;// = false - показываем сообщение о свежих данных
+            photos.clear();
+            loadPhotosFromCache();//Если по каким то причинам данные не пришли, выводим прошлые данные с кеша
             startNewPhotos();
         }
     }
