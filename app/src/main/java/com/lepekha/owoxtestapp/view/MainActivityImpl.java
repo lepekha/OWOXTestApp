@@ -124,5 +124,15 @@ public class MainActivityImpl extends AppCompatActivity implements MainActivity{
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("progressBarState",progressBar.getVisibility());
+    }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        progressBar.setVisibility(savedInstanceState.getInt("progressBarState",View.GONE));
+    }
 }
