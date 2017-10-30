@@ -59,7 +59,8 @@ public class DownloadPhotosImpl implements DownloadPhotos {
                         }
 
                         @Override
-                        public void onError(Throwable e) {
+                        public void onError(Throwable e)
+                        {
                             errorLoad();
                         }
 

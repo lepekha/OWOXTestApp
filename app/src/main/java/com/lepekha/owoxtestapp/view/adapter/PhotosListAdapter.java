@@ -68,7 +68,7 @@ public class PhotosListAdapter extends RecyclerView.Adapter<PhotosListAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Picasso.with(context).load(photos.get(position).getUrls().getThumb()).placeholder(R.drawable.ic_image_black_24dp).error(R.drawable.ic_error_black_24dp).into(holder.imgThumbneilPhoto);
+        Picasso.with(context).load(photos.get(position).getUrls().getThumb()).placeholder(R.color.photos_list_placeholder).error(R.drawable.ic_error_black_24dp).into(holder.imgThumbneilPhoto);
     }
 
     @Override

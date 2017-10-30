@@ -79,7 +79,7 @@ public class ListPhotosFragment extends Fragment implements PhotosListAdapter.On
 
     public static final String FRAGMENT_NAME = "fragment_photos_list";
     private static final int ANIM_SHOW_TRANSLATION_Y = -50;
-    private static final int ANIM_HIDE_TRANSLATION_Y = 150;
+    private static final int ANIM_HIDE_TRANSLATION_Y = 250;
 
     private PhotosListAdapter photosListAdapter;
     private RecyclerView.LayoutManager photoListManager;
