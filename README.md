@@ -9,5 +9,5 @@
 Ссылка на .apk файл: https://drive.google.com/open?id=0BwDcvzt02ux4aFRMZmZnbEJCc00
 
 Скриншоты:
-![Скриншот_1](https://github.com/lepekha/OWOXTestApp/blob/master/screen_1.png)
-![Скриншот_2](https://github.com/lepekha/OWOXTestApp/blob/master/screen_2.png) 
+![Скриншот_1](https://github.com/lepekha/OWOXTestApp/blob/master/screen__1.png)
+![Скриншот_2](https://github.com/lepekha/OWOXTestApp/blob/master/screen__2.png) 
