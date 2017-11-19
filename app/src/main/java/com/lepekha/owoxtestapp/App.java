@@ -23,6 +23,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         buildComponent();
+
     }
 
     protected void buildComponent(){

@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import retrofit2.adapter.rxjava.HttpException;
 import rx.Observer;
 
 /**
@@ -61,6 +62,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
                         @Override
                         public void onError(Throwable e)
                         {
+                            Log.e("error",e.toString());
                             errorLoad();
                         }
 
@@ -81,6 +83,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
         requestImpl
                 .searchPhotos(query, String.valueOf(page), String.valueOf(per_page))
                 .subscribe(new Observer<SearchPhoto>(){
+
                     @Override
                     public void onCompleted() {
 
@@ -88,6 +91,7 @@ public class DownloadPhotosImpl implements DownloadPhotos {
 
                     @Override
                     public void onError(Throwable e) {
+
                         errorLoad();
                     }
 
